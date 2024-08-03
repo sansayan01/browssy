@@ -11,7 +11,7 @@ class SplitViewWidget(QWidget):
         self.layout = QVBoxLayout(self)
         self.layout.addWidget(self.splitter)
         self.setLayout(self.layout)
-        self.splitter.setSizes([1, 1])  # Initialize sizes for the split panels
+        self.splitter.setSizes([1, 1])
 
     def add_webview(self, url="https://www.google.com"):
         browser = QWebEngineView()
@@ -46,11 +46,10 @@ class MainWindow(QMainWindow):
         self.tabs.tabCloseRequested.connect(self.close_tab)
         self.setCentralWidget(self.tabs)
 
-        self.create_tab()
+        self.create_tab(is_initial=True)
 
         self.showMaximized()
 
-        # Navbar
         navbar = QToolBar()
         navbar.setStyleSheet("background-color: #2b2b2b;")
         self.addToolBar(navbar)
@@ -106,9 +105,10 @@ class MainWindow(QMainWindow):
         spacer.setFixedWidth(10)
         return spacer
 
-    def create_tab(self):
+    def create_tab(self, is_initial=False):
         tab_widget = SplitViewWidget()
-        browser = tab_widget.add_webview("https://www.youtube.com")
+        url = "https://www.youtube.com" if is_initial else "https://www.google.com"
+        browser = tab_widget.add_webview(url)
         i = self.tabs.addTab(tab_widget, "New Tab")
         self.tabs.setCurrentIndex(i)
         browser.urlChanged.connect(lambda qurl, browser=browser: self.update_url(qurl, browser))
@@ -162,9 +162,8 @@ class MainWindow(QMainWindow):
     def split_view(self):
         current_tab = self.tabs.currentWidget()
         if isinstance(current_tab, SplitViewWidget):
-            # Split the current tab into two views
             new_browser = current_tab.add_webview("https://www.google.com")
-            self.tabs.currentWidget().update()  # Refresh the layout
+            self.tabs.currentWidget().update()
 
 app = QApplication(sys.argv)
 QApplication.setApplicationName('browssy')
